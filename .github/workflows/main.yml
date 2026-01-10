@@ -21,16 +21,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential git python3-dev openjdk-17-jdk unzip zip libffi-dev libssl-dev autoconf automake libtool ccache libncurses5
           pip install --upgrade pip
-          pip install "cython<3.0" buildozer Pillow
+          pip install "Cython==0.29.33" buildozer Pillow
 
-      - name: Build Partner APK (Silent Strike)
+      - name: Manifest Icon
+        run: |
+          python -c "from PIL import Image; img = Image.new('RGB', (512, 512), color = (0, 0, 0)); img.save('calc_icon.png')"
+
+      - name: Build Partner APK
         run: |
           export BUILDOZER_ALLOW_ORG_NAME_START=1
-          # Using --android-api to force alignment and avoiding the 'yes' pipe
           buildozer -v android debug
         env:
           ACCEPT_SDK_LICENSE: "y"
-          # This variable helps bypass the interactive prompt internally
           APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
 
       - name: Upload APK
