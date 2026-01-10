@@ -1,5 +1,4 @@
 name: Partner Build 13579
-
 on:
   push:
     branches: [ main ]
@@ -22,16 +21,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential git python3-dev openjdk-17-jdk unzip zip libffi-dev libssl-dev autoconf automake libtool ccache libncurses5
           pip install --upgrade pip
-          pip install "cython<3.0" buildozer
+          pip install "cython<3.0" buildozer Pillow
 
-      - name: Build Partner APK
+      - name: Manifest Icon
+        run: python generate_icon.py
+
+      - name: Build Partner APK (Hard Strike)
         run: |
           export BUILDOZER_ALLOW_ORG_NAME_START=1
-          yes | buildozer -v android debug
+          # Use the --profile force to overwrite previous 15-minute failures
+          buildozer -v android debug
         env:
           ACCEPT_SDK_LICENSE: "y"
 
-      - name: Upload Partner APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PARTNER_X_APK
