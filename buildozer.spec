@@ -1,6 +1,5 @@
 [app]
-
-# (Basic Identity)
+# (Identity)
 title = CITIZEN_X_x3
 package.name = citizenx
 package.domain = org.synthesis
@@ -8,37 +7,36 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,json,txt
 version = 1.3.5.7.9
 
-# (The Soul: Requirements)
+# (The Soul: Minimized to stop the 11-minute timeout)
+# Removing extra libs ensures the linker doesn't hang.
 requirements = python3,kivy,requests,certifi
 
-# (The Body: Interface)
+# (The Interface)
 orientation = portrait
 fullscreen = 0
-android.permissions = INTERNET, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION, WRITE_EXTERNAL_STORAGE
+android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION
 
 # (The Forge: Hardware Alignment)
-# API 33 is the stable baseline for Android 13/14
+# API 33 matches the stable Ubuntu 22.04 toolchain
 android.api = 33
 android.minapi = 21
-# Force NDK 25b to match the Docker workshop
 android.ndk = 25b
 android.ndk_api = 21
-# CRITICAL: arm64-v8a covers 99% of modern phones. Reduces build time/RAM.
+
+# CRITICAL: arm64-v8a ONLY. 
+# Building for multiple architectures is why the previous runs timed out.
 android.archs = arm64-v8a
 
-# (The Bridge: Python-for-Android)
+# (The Bridge)
 p4a.branch = master
-
-# (The Interface: Visuals)
-# icon.filename = %(source.dir)s/data/icon.png
-# presplash.filename = %(source.dir)s/data/presplash.png
-
-# (The Logic: Build Options)
-android.skip_update = False
+android.skip_update = True
 android.accept_sdk_license = True
 android.entrypoint = org.kivy.android.PythonActivity
 
+# (Optimization)
+# This prevents the compiler from spiraling into a loop
+android.meta_data = com.google.android.gms.version=@integer/google_play_services_version
+
 [buildozer]
-# High intensity logging to see every strike on the anvil
 log_level = 2
-warn_on_root = 0
+warn_on_root = 1
