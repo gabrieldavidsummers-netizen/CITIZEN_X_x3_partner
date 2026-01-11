@@ -7,46 +7,25 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest # Docker handles the OS, so we go back to latest
     timeout-minutes: 60
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # THE ATOMIC BYPASS: Using a Docker container to ignore host conflicts
+      - name: Build with Buildozer Docker
+        uses: docker://kivy/buildozer:latest
         with:
-          python-version: '3.11'
-
-      - name: Install Dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y git zip unzip autoconf libtool pkg-config zlib1g-dev \
-          libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev \
-          build-essential python3-dev python3-pip libsqlite3-dev sqlite3 bzip2 \
-          libbz2-dev zlib1g-dev libgdbm-dev libgdbm-compat-dev liblzma-dev \
-          libreadline-dev uuid-dev libopenblas-dev libxml2-dev libxslt-dev \
-          openjdk-17-jdk ant
-
-      - name: Install Buildozer and Cython
-        run: |
-          pip install --upgrade pip
-          pip install "buildozer==1.5.0" "cython<3.0"
-
-      # STRIKE: Force Buildozer to use the internal SDK/NDK and ignore system paths
-      - name: Execute Partner Build
-        run: |
-          yes | buildozer -v android debug
+          args: android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          # This forces Buildozer to ignore the GitHub default NDK which is causing the crash
-          APP_ANDROID_NDK_PATH: "" 
-          APP_ANDROID_SDK_PATH: ""
 
       - name: Upload Partner APK
         uses: actions/upload-artifact@v4
         with:
           name: Partner-Build-13579
           path: bin/*.apk
+          if-no-files-found: error
           
