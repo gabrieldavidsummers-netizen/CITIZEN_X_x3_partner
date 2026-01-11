@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Stable iron
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
+          # CACHE REMOVED: NO MORE 4-SECOND BRICK
 
       - name: Install System Dependencies
         run: |
@@ -35,10 +35,8 @@ jobs:
 
       - name: Build with Buildozer
         run: |
-          # The 'yes |' handles all license prompts automatically
           yes | buildozer -v android debug
         env:
-          # Limit Gradle memory to stay under the 7GB runner limit
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
       - name: Upload APK
