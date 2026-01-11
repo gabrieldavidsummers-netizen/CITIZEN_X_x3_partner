@@ -1,4 +1,4 @@
-name: Injection Strike 13579
+name: Iron-Grip Strike 13579
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # THE PIVOT: Use a pre-built image to skip the 1-minute NDK download/unzip death loop
     container:
       image: kivy/buildozer:latest
 
@@ -16,24 +15,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Add Swap Space
-        run: |
-          # Inside Docker, we rely on the host's swap, but we force memory limits
-          export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx2g"
-
       - name: Forge APK
         run: |
-          # We are already root in this container
-          # Force a clean build with zero external SDK/NDK downloads
-          buildozer -v android debug
+          # FORCE 'YES' TO THE ROOT PROMPT AND EXECUTE
+          # Using 'yes' pipes 'y' infinitely to any prompt
+          yes | buildozer -v android debug
         env:
-          # Tell Buildozer to use the container's internal paths
-          BUILDOZER_ALLOW_ORG_NAME_BY_ROOT: 1
+          # Additional flag to suppress root warnings
+          BUILDOZER_WARN_ON_ROOT: 0
           TERM: dumb
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: CITIZEN_X_PARTNER_STRIKE
+          name: CITIZEN_X_PARTNER_FINAL
           path: bin/*.apk
           
