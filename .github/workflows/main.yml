@@ -1,4 +1,4 @@
-name: Iron-Grip Strike 13579
+name: Override Strike 13579
 
 on:
   push:
@@ -8,27 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: kivy/buildozer:latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Forge APK
-        run: |
-          # FORCE 'YES' TO THE ROOT PROMPT AND EXECUTE
-          # Using 'yes' pipes 'y' infinitely to any prompt
-          yes | buildozer -v android debug
-        env:
-          # Additional flag to suppress root warnings
-          BUILDOZER_WARN_ON_ROOT: 0
-          TERM: dumb
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
+      - name: Build APK with Buildozer Action
+        uses: Josh-Feldman/buildozer-action@master
+        with:
+          save_build_dir: true
+          buildozer_version: master
+          python_version: 3.11
 
-      - name: Upload APK
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CITIZEN_X_PARTNER_FINAL
+          name: CITIZEN_X_PARTNER_STRIKE
           path: bin/*.apk
           
