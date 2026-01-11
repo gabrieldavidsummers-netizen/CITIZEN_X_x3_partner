@@ -26,8 +26,14 @@ jobs:
 
       - name: Forge
         run: |
-          # Strike without looking back. 
-          # No 'clean' command to trip on empty directories.
           export PATH=$PATH:$HOME/.local/bin
+          # The forge is already hot. This will use the cache and finish fast.
           buildozer -v android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CITIZEN_X_FINAL_BODY
+          # This is the precise path where Buildozer drops the payload
+          path: bin/*.apk
           
