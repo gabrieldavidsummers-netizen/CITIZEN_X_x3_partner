@@ -12,19 +12,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # STRIKE: Cache the Android Workshop to save 10+ minutes on future runs
+      # STRIKE: PERSISTENCE (Cache intermediate files to save time)
       - name: Cache Buildozer Global Directory
         uses: actions/cache@v4
         with:
           path: .buildozer
           key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
 
-      - name: Add Swap Space
+      - name: Add Swap Space (4GB Lungs)
         run: |
           sudo fallocate -l 4G /swapfile
           sudo chmod 600 /swapfile
           sudo mkswap /swapfile
           sudo swapon /swapfile
+
+      # STRIKE: THE JAVA FIX (Force Java 17)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +41,7 @@ jobs:
       - name: Surgical Dependency Injection
         run: |
           sudo apt update
-          sudo apt install -y libncurses5 libtinfo5 pkg-config cmake openjdk-17-jdk
+          sudo apt install -y libncurses5 libtinfo5 pkg-config cmake
 
       - name: Install Buildozer & Cython
         run: |
