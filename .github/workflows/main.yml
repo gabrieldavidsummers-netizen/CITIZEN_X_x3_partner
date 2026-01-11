@@ -27,12 +27,15 @@ jobs:
         run: |
           python -c "from PIL import Image; img = Image.new('RGB', (512, 512), color = (0, 0, 0)); img.save('calc_icon.png')"
 
-      - name: Build Partner APK (Purge Strike)
+      - name: Build Partner APK (The Iteration Killer)
         run: |
-          # UNSETTING SYSTEM NDK TO PREVENT HIJACK
+          # COMPLETELY BLINDING THE RUNNER TO SYSTEM NDK
           unset ANDROID_NDK_HOME
           unset ANDROID_NDK_LATEST_HOME
+          export ANDROID_NDK_ROOT=""
+          
           export BUILDOZER_ALLOW_ORG_NAME_START=1
+          # FORCE BUILD WITHOUT INTERACTION
           buildozer -v android debug
         env:
           ACCEPT_SDK_LICENSE: "y"
