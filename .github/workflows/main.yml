@@ -1,4 +1,4 @@
-name: Sure-Strike 13579
+name: Unbound Strike 13579
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .buildozer
-          key: buildozer-v3-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-v4-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
