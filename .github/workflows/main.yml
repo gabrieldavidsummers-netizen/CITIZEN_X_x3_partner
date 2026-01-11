@@ -1,4 +1,4 @@
-name: Clean Strike 13579
+name: Sure-Strike 13579
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .buildozer
-          key: buildozer-v2-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          key: buildozer-v3-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -42,16 +42,16 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Forge APK
-        env:
-          JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
         run: |
+          export JAVA_HOME=$JAVA_HOME_17_X64
+          export PATH=$JAVA_HOME/bin:$PATH
+          export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4g"
           export TERM=dumb
           buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: CITIZEN_X_PARTNER_FINAL
+          name: CITIZEN_X_PARTNER_STRIKE
           path: bin/*.apk
           
