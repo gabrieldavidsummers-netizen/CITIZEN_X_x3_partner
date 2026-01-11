@@ -1,4 +1,4 @@
-name: Override Strike 13579
+name: Skeleton Forge 13579
 
 on:
   push:
@@ -7,21 +7,27 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Build APK with Buildozer Action
-        uses: Josh-Feldman/buildozer-action@master
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          save_build_dir: true
-          buildozer_version: master
-          python_version: 3.11
+          java-version: '17'
+          distribution: 'temurin'
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CITIZEN_X_PARTNER_STRIKE
-          path: bin/*.apk
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libncurses5 libtinfo5 pkg-config cmake antiword
+          pip install --user --upgrade buildozer cython==0.29.33
+
+      - name: Forge
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          # THE STRIKE: Force a fresh start
+          buildozer android clean
+          buildozer -v android debug
           
