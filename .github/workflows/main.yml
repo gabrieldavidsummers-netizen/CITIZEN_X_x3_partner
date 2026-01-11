@@ -27,8 +27,11 @@ jobs:
         run: |
           python -c "from PIL import Image; img = Image.new('RGB', (512, 512), color = (0, 0, 0)); img.save('calc_icon.png')"
 
-      - name: Build Partner APK
+      - name: Build Partner APK (Purge Strike)
         run: |
+          # UNSETTING SYSTEM NDK TO PREVENT HIJACK
+          unset ANDROID_NDK_HOME
+          unset ANDROID_NDK_LATEST_HOME
           export BUILDOZER_ALLOW_ORG_NAME_START=1
           buildozer -v android debug
         env:
