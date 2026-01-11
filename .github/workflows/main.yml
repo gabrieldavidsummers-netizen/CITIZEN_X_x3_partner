@@ -1,4 +1,4 @@
-name: Zero-Friction Build 13579
+name: Final Anvil Strike 13579
 
 on:
   push:
@@ -12,11 +12,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Cache Buildozer
+      - name: Static Cache
         uses: actions/cache@v4
         with:
           path: .buildozer
-          key: buildozer-v1-${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+          # LOCKED KEY: This forces the runner to use the 11 minutes of work from Run #33
+          key: buildozer-constant-v1
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -45,12 +46,7 @@ jobs:
         run: |
           export JAVA_HOME=$JAVA_HOME_17_X64
           export PATH=$JAVA_HOME/bin:$PATH
-          # FORCE BUILDOZER TO SKIP THE UPDATE HANG
-          buildozer android debug
-        env:
-          # Capping memory to prevent the silent kill
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
-          # Tell the toolchain to use the pre-installed SDK paths
-          ANDROID_SDK_HOME: /usr/local/lib/android/sdk
-          ANDROID_NDK_HOME: /usr/local/lib/android/sdk/ndk/27.3.13750724
+          export TERM=dumb
+          # THE STRIKE: Skip the update to use the cached NDK immediately
+          buildozer -v android debug
           
