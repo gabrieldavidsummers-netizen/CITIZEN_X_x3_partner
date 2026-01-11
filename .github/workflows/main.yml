@@ -14,13 +14,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # STRIKE 1: Open the floor (Permissions)
+      # STRIKE 1: THE HARDWARE HACK (Adding 4GB of Virtual RAM)
+      - name: Add Swap Space
+        run: |
+          sudo fallocate -l 4G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          sudo swapon --show
+
+      # STRIKE 2: Open the floor
       - name: Fix Workspace Permissions
         run: |
           chmod -R 777 .
           sudo chown -R 1000:1000 .
 
-      # STRIKE 2: The Stabilized Forge
+      # STRIKE 3: The Stabilized Forge
       - name: Build with Buildozer Docker
         uses: docker://kivy/buildozer:latest
         with:
@@ -28,9 +37,8 @@ jobs:
         env:
           ACCEPT_SDK_LICENSE: "yes"
           BUILDOZER_WARN_ON_ROOT: 0
-          # MEMORY STABILIZER: Keeps Gradle from crashing the runner
+          # We keep the RAM limits on Gradle just to be safe
           GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx1536m"
-          # LOGGING: If it fails, we will see exactly why
           BUILDOZER_LOG_LEVEL: 2
 
       - name: Upload Partner APK
