@@ -14,20 +14,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # STRIKE 1: Open the floor for the Docker container
+      # STRIKE 1: Open the floor (Permissions)
       - name: Fix Workspace Permissions
         run: |
           chmod -R 777 .
           sudo chown -R 1000:1000 .
 
-      # STRIKE 2: The Silenced Forge
+      # STRIKE 2: The Stabilized Forge
       - name: Build with Buildozer Docker
         uses: docker://kivy/buildozer:latest
         with:
           args: android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
-          BUILDOZER_WARN_ON_ROOT: 0  # <--- THIS IS THE KEY. IT STOPS THE QUESTION.
+          BUILDOZER_WARN_ON_ROOT: 0
+          # MEMORY STABILIZER: Keeps Gradle from crashing the runner
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.jvmargs=-Xmx1536m"
+          # LOGGING: If it fails, we will see exactly why
+          BUILDOZER_LOG_LEVEL: 2
 
       - name: Upload Partner APK
         uses: actions/upload-artifact@v4
