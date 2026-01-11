@@ -1,4 +1,4 @@
-name: Surgical Build 13579
+name: Persistence Build 13579
 
 on:
   push:
@@ -12,16 +12,29 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # STRIKE: Cache the Android Workshop to save 10+ minutes on future runs
+      - name: Cache Buildozer Global Directory
+        uses: actions/cache@v4
+        with:
+          path: .buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+
+      - name: Add Swap Space
+        run: |
+          sudo fallocate -l 4G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Surgical Dependency Injection
-        # We only install the critical missing libs to avoid the 9-minute delay
         run: |
           sudo apt update
-          sudo apt install -y libncurses5 libtinfo5 pkg-config
+          sudo apt install -y libncurses5 libtinfo5 pkg-config cmake openjdk-17-jdk
 
       - name: Install Buildozer & Cython
         run: |
@@ -29,16 +42,7 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Forge APK
-        run: |
-          # Use --profile to ensure we are using the minimal required tools
-          yes | buildozer -v android debug
+        run: buildozer -v android debug
         env:
-          # Keep Gradle on a short leash to save RAM
-          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2g"
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CITIZEN_X_FINAL
-          path: bin/*.apk
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g"
           
