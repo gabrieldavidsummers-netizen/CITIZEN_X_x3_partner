@@ -7,31 +7,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    # INCREASED GUMPTION: Preventing the 10-minute timeout
+    # THE RE-ANCHOR: Moving back to the stable anvil
+    runs-on: ubuntu-22.04 
     timeout-minutes: 60 
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # STRIKE 1: PURGE THE GHOSTS
-      # Removes old build artifacts that cause the 60% compression hang
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: Clear Legacy Cache
         run: |
           rm -rf .buildozer
           rm -rf bin/
           mkdir -p .buildozer
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      # STRIKE 2: HARDEN THE ENVIRONMENT
       - name: Install Buildozer Dependencies
         run: |
           sudo apt update
+          # This list is tuned for the 22.04 Jammy environment
           sudo apt install -y git zip unzip autoconf libtool pkg-config zlib1g-dev \
           libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev \
           build-essential python3-dev python3-pip libsqlite3-dev sqlite3 bzip2 \
@@ -42,16 +40,14 @@ jobs:
       - name: Install Buildozer and Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer cython==0.29.33
+          pip install buildozer "cython<3.0"
 
-      # STRIKE 3: THE COMPRESSION PUSH
       - name: Execute Partner Build
         run: |
           buildozer -v android debug
         env:
           ACCEPT_SDK_LICENSE: "yes"
 
-      # STRIKE 4: EXTRACT THE BODY (CITIZEN_X)
       - name: Upload Partner APK
         uses: actions/upload-artifact@v4
         with:
